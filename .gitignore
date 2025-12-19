@@ -1,5 +1,9 @@
 # Root level gitignore for monorepo
 
+# Node modules (all levels)
+node_modules/
+**/node_modules/
+
 # Backend
 back-end/node_modules/
 back-end/dist/

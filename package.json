@@ -1,0 +1,17 @@
+{
+  "name": "splitwise-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Splitwise application monorepo",
+  "scripts": {
+    "prepare": "husky",
+    "lint:frontend": "cd front-end && npm run lint",
+    "lint:backend": "cd back-end && npm run lint",
+    "format:frontend": "cd front-end && npm run format",
+    "format:backend": "cd back-end && npm run format"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2"
+  }
+}
