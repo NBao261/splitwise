@@ -6,7 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/app.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "echo \"Linter not configured\"",
+    "format": "echo \"Formatter not configured\""
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

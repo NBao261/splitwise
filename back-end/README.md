@@ -99,3 +99,70 @@ Xem file `env.example` để biết các biến môi trường cần thiết:
 - Trong production, nhớ thay đổi `JWT_SECRET` thành giá trị bảo mật
 - File `.env` không nên commit lên git (đã có trong .gitignore)
 
+## Git Setup
+
+### Lần đầu tiên clone project:
+
+1. **Clone repository:**
+```bash
+git clone <repository-url>
+cd splitwise/back-end
+```
+
+2. **Cài đặt dependencies:**
+```bash
+npm install
+```
+
+3. **Tạo file .env:**
+```bash
+cp env.example .env
+# Sau đó chỉnh sửa các giá trị trong .env
+```
+
+### Trước khi commit:
+
+1. **Kiểm tra file sẽ commit:**
+```bash
+git status
+```
+
+2. **Đảm bảo không commit:**
+   - `node_modules/`
+   - `.env`
+   - `dist/`
+   - Các file log
+
+3. **Commit và push:**
+```bash
+git add .
+git commit -m "feat: your commit message"
+git push
+```
+
+## File Structure
+
+```
+back-end/
+├── .gitignore          # Git ignore rules
+├── .gitattributes      # Git attributes (line endings)
+├── .editorconfig      # Editor configuration
+├── .env               # Environment variables (NOT in git)
+├── env.example        # Environment variables template
+├── package.json       # Dependencies
+├── tsconfig.json      # TypeScript config
+├── README.md          # Documentation
+└── src/
+    ├── config/        # Configuration files
+    ├── constants/     # Constants (messages, status codes)
+    ├── controllers/   # Controllers
+    ├── docs/          # Swagger documentation
+    ├── lib/           # Database connection
+    ├── middlewares/   # Middlewares
+    ├── models/        # Models & Schemas
+    ├── routes/        # Routes
+    ├── services/      # Business logic
+    ├── utils/         # Utility functions
+    └── index.ts       # Entry point
+```
+

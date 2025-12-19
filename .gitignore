@@ -1,0 +1,34 @@
+# Root level gitignore for monorepo
+
+# Backend
+back-end/node_modules/
+back-end/dist/
+back-end/.env
+back-end/*.log
+
+# Frontend
+front-end/node_modules/
+front-end/dist/
+front-end/.env
+front-end/*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
