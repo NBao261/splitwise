@@ -6,7 +6,13 @@ import { connectDB, getDb } from './lib/db';
 import { envConfig } from './config/env.config';
 import { swaggerSpec } from './config/swagger.config';
 import authRoutes from './routes/auth.routes';
-import { errorResponse, getStatusCodeFromError, formatErrorMessage, handleZodError, AppError } from './utils';
+import {
+  errorResponse,
+  getStatusCodeFromError,
+  formatErrorMessage,
+  handleZodError,
+  AppError,
+} from './utils';
 import { ERROR_MESSAGES, HTTP_STATUS } from './constants';
 
 // Khởi tạo Express app
@@ -18,10 +24,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Swagger Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Splitwise API Documentation',
-}));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Splitwise API Documentation',
+  })
+);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
@@ -39,30 +49,43 @@ app.use('/api/auth', authRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
-  return errorResponse(res, ERROR_MESSAGES.SERVER.ROUTE_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+  return errorResponse(
+    res,
+    ERROR_MESSAGES.SERVER.ROUTE_NOT_FOUND,
+    HTTP_STATUS.NOT_FOUND
+  );
 });
 
 // Error handler middleware
-app.use((err: Error | ZodError | AppError, req: Request, res: Response, next: NextFunction) => {
-  console.error('Error:', err);
+app.use(
+  (
+    err: Error | ZodError | AppError,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    console.error('Error:', err);
 
-  // Xử lý lỗi từ Zod validation
-  if (err instanceof ZodError) {
-    const message = handleZodError(err);
-    return errorResponse(res, message, HTTP_STATUS.BAD_REQUEST);
+    // Xử lý lỗi từ Zod validation
+    if (err instanceof ZodError) {
+      const message = handleZodError(err);
+      return errorResponse(res, message, HTTP_STATUS.BAD_REQUEST);
+    }
+
+    // Xử lý lỗi từ AppError
+    if (err instanceof AppError) {
+      return errorResponse(res, err.message, err.statusCode);
+    }
+
+    // Xử lý lỗi thông thường
+    const statusCode = getStatusCodeFromError(err);
+    const message =
+      formatErrorMessage(err, envConfig.NODE_ENV === 'development') ||
+      ERROR_MESSAGES.SERVER.INTERNAL_ERROR;
+
+    return errorResponse(res, message, statusCode);
   }
-
-  // Xử lý lỗi từ AppError
-  if (err instanceof AppError) {
-    return errorResponse(res, err.message, err.statusCode);
-  }
-
-  // Xử lý lỗi thông thường
-  const statusCode = getStatusCodeFromError(err);
-  const message = formatErrorMessage(err, envConfig.NODE_ENV === 'development') || ERROR_MESSAGES.SERVER.INTERNAL_ERROR;
-  
-  return errorResponse(res, message, statusCode);
-});
+);
 
 // Khởi động server
 const startServer = async () => {
@@ -82,10 +105,11 @@ const startServer = async () => {
     });
   } catch (error: any) {
     console.error('\n❌ Failed to start server:', error.message);
-    console.error('\n💡 Hãy đảm bảo MongoDB đang chạy trước khi start server.\n');
+    console.error(
+      '\n💡 Hãy đảm bảo MongoDB đang chạy trước khi start server.\n'
+    );
     process.exit(1);
   }
 };
 
 startServer();
-

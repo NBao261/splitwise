@@ -5,7 +5,11 @@ import { getDb } from '../lib/db';
 import { envConfig } from '../config/env.config';
 import { ERROR_MESSAGES, HTTP_STATUS } from '../constants';
 import { AppError } from '../utils';
-import { UserRegisterInput, UserLoginInput, UserDocument } from '../models/user.model';
+import {
+  UserRegisterInput,
+  UserLoginInput,
+  UserDocument,
+} from '../models/user.model';
 import { userRegisterSchema, userLoginSchema } from '../models/user.model';
 
 /**
@@ -19,19 +23,30 @@ export async function register(userData: UserRegisterInput) {
 
   const db = getDb();
   if (!db) {
-    throw new AppError(ERROR_MESSAGES.SERVER.DATABASE_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    throw new AppError(
+      ERROR_MESSAGES.SERVER.DATABASE_ERROR,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 
   const usersCollection = db.collection<UserDocument>('users');
 
   // Kiểm tra email đã tồn tại chưa
-  const existingUser = await usersCollection.findOne({ email: validatedData.email });
+  const existingUser = await usersCollection.findOne({
+    email: validatedData.email,
+  });
   if (existingUser) {
-    throw new AppError(ERROR_MESSAGES.AUTH.EMAIL_ALREADY_EXISTS, HTTP_STATUS.CONFLICT);
+    throw new AppError(
+      ERROR_MESSAGES.AUTH.EMAIL_ALREADY_EXISTS,
+      HTTP_STATUS.CONFLICT
+    );
   }
 
   // Hash password
-  const hashedPassword = await bcrypt.hash(validatedData.password, envConfig.BCRYPT_SALT_ROUNDS);
+  const hashedPassword = await bcrypt.hash(
+    validatedData.password,
+    envConfig.BCRYPT_SALT_ROUNDS
+  );
 
   // Tạo user mới
   const newUser: Omit<UserDocument, '_id'> = {
@@ -46,7 +61,10 @@ export async function register(userData: UserRegisterInput) {
 
   // Kiểm tra insert thành công
   if (!result.insertedId) {
-    throw new AppError(ERROR_MESSAGES.USER.CREATE_FAILED, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    throw new AppError(
+      ERROR_MESSAGES.USER.CREATE_FAILED,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 
   // Trả về user (không bao gồm password) - tối ưu: không cần query lại
@@ -69,7 +87,10 @@ export async function login(loginData: UserLoginInput) {
 
   const db = getDb();
   if (!db) {
-    throw new AppError(ERROR_MESSAGES.SERVER.DATABASE_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    throw new AppError(
+      ERROR_MESSAGES.SERVER.DATABASE_ERROR,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 
   const usersCollection = db.collection<UserDocument>('users');
@@ -77,13 +98,22 @@ export async function login(loginData: UserLoginInput) {
   // Tìm user theo email
   const user = await usersCollection.findOne({ email: validatedData.email });
   if (!user) {
-    throw new AppError(ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS, HTTP_STATUS.UNAUTHORIZED);
+    throw new AppError(
+      ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS,
+      HTTP_STATUS.UNAUTHORIZED
+    );
   }
 
   // Kiểm tra password
-  const isPasswordValid = await bcrypt.compare(validatedData.password, user.password);
+  const isPasswordValid = await bcrypt.compare(
+    validatedData.password,
+    user.password
+  );
   if (!isPasswordValid) {
-    throw new AppError(ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS, HTTP_STATUS.UNAUTHORIZED);
+    throw new AppError(
+      ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS,
+      HTTP_STATUS.UNAUTHORIZED
+    );
   }
 
   // Tạo JWT token
@@ -93,14 +123,15 @@ export async function login(loginData: UserLoginInput) {
   } else if (typeof user._id === 'string') {
     userId = user._id;
   } else {
-    throw new AppError(ERROR_MESSAGES.AUTH.USER_ID_NOT_FOUND, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    throw new AppError(
+      ERROR_MESSAGES.AUTH.USER_ID_NOT_FOUND,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 
-  const token = jwt.sign(
-    { userId },
-    envConfig.JWT_SECRET,
-    { expiresIn: envConfig.JWT_EXPIRES_IN } as SignOptions
-  );
+  const token = jwt.sign({ userId }, envConfig.JWT_SECRET, {
+    expiresIn: envConfig.JWT_EXPIRES_IN,
+  } as SignOptions);
 
   // Trả về token và user (không bao gồm password)
   const { password: _, ...userWithoutPassword } = user;
@@ -124,17 +155,23 @@ export async function logout(userId: string) {
   // Verify user tồn tại (optional - để đảm bảo user hợp lệ)
   const db = getDb();
   if (!db) {
-    throw new AppError(ERROR_MESSAGES.SERVER.DATABASE_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    throw new AppError(
+      ERROR_MESSAGES.SERVER.DATABASE_ERROR,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 
   const usersCollection = db.collection<UserDocument>('users');
-  
+
   // Convert userId string to ObjectId
   let userObjectId: ObjectId;
   try {
     userObjectId = new ObjectId(userId);
   } catch (error) {
-    throw new AppError(ERROR_MESSAGES.AUTH.USER_ID_NOT_FOUND, HTTP_STATUS.BAD_REQUEST);
+    throw new AppError(
+      ERROR_MESSAGES.AUTH.USER_ID_NOT_FOUND,
+      HTTP_STATUS.BAD_REQUEST
+    );
   }
 
   const user = await usersCollection.findOne({ _id: userObjectId });
@@ -146,7 +183,6 @@ export async function logout(userId: string) {
   // Với JWT stateless, không cần làm gì thêm
   // Client sẽ tự xóa token
   // Nếu muốn bảo mật hơn, có thể implement token blacklist ở đây
-  
+
   return { message: 'Đăng xuất thành công' };
 }
-

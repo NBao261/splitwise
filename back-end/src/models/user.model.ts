@@ -31,4 +31,3 @@ export interface UserDocument {
   createdAt?: Date;
   updatedAt?: Date;
 }
-

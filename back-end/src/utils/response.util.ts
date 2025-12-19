@@ -51,4 +51,3 @@ export const errorResponse = (
 
   return res.status(statusCode).json(response);
 };
-

@@ -24,4 +24,3 @@ export const SUCCESS_MESSAGES = {
     DATA_RETRIEVED: 'Lấy dữ liệu thành công',
   },
 } as const;
-

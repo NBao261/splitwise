@@ -8,7 +8,11 @@ export class AppError extends Error {
   statusCode: number;
   isOperational: boolean;
 
-  constructor(message: string, statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR, isOperational: boolean = true) {
+  constructor(
+    message: string,
+    statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    isOperational: boolean = true
+  ) {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = isOperational;
@@ -20,7 +24,7 @@ export class AppError extends Error {
  * Xử lý lỗi từ Zod validation
  */
 export const handleZodError = (error: ZodError): string => {
-  const errors = error.issues.map((issue) => {
+  const errors = error.issues.map(issue => {
     const field = issue.path.join('.');
     return `${field}: ${issue.message}`;
   });
@@ -83,7 +87,10 @@ export const getStatusCodeFromError = (error: Error | AppError): number => {
 /**
  * Format error message cho client (ẩn thông tin nhạy cảm)
  */
-export const formatErrorMessage = (error: Error, isDevelopment: boolean = false): string => {
+export const formatErrorMessage = (
+  error: Error,
+  isDevelopment: boolean = false
+): string => {
   if (error instanceof AppError && error.isOperational) {
     return error.message;
   }
@@ -95,4 +102,3 @@ export const formatErrorMessage = (error: Error, isDevelopment: boolean = false)
 
   return error.message;
 };
-

@@ -25,4 +25,3 @@ const loadSwaggerSpec = () => {
 };
 
 export const swaggerSpec = loadSwaggerSpec();
-

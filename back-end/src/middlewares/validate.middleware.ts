@@ -19,8 +19,11 @@ export const validate = (schema: ZodSchema) => {
         const message = handleZodError(error);
         return errorResponse(res, message, HTTP_STATUS.BAD_REQUEST);
       }
-      return errorResponse(res, ERROR_MESSAGES.VALIDATION.INVALID_INPUT, HTTP_STATUS.BAD_REQUEST);
+      return errorResponse(
+        res,
+        ERROR_MESSAGES.VALIDATION.INVALID_INPUT,
+        HTTP_STATUS.BAD_REQUEST
+      );
     }
   };
 };
-
