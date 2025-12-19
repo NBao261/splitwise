@@ -1,0 +1,350 @@
+openapi: 3.0.0
+info:
+  title: Splitwise API
+  version: 1.0.0
+  description: API Documentation cho hệ thống quản lý tài chính nhóm
+  contact:
+    name: API Support
+    email: support@splitwise.com
+  license:
+    name: ISC
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://api.splitwise.com
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: API xác thực người dùng
+  - name: Health
+    description: API kiểm tra trạng thái server
+
+paths:
+  /health:
+    get:
+      summary: Kiểm tra trạng thái server
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Server đang chạy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Server is running
+                  database:
+                    type: string
+                    example: connected
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /api/auth/register:
+    post:
+      summary: Đăng ký user mới
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              email: user@example.com
+              password: password123
+              username: john_doe
+      responses:
+        '201':
+          description: Đăng ký thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+              example:
+                success: true
+                message: Đăng ký thành công
+                data:
+                  _id: "507f1f77bcf86cd799439011"
+                  email: user@example.com
+                  username: john_doe
+                  createdAt: "2024-01-01T00:00:00.000Z"
+                  updatedAt: "2024-01-01T00:00:00.000Z"
+        '400':
+          description: Lỗi validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              example:
+                success: false
+                message: "email: Email không hợp lệ, password: Mật khẩu phải có ít nhất 6 ký tự"
+        '409':
+          description: Email đã được sử dụng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Email đã được sử dụng
+        '500':
+          description: Lỗi server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Đã xảy ra lỗi. Vui lòng thử lại sau.
+
+  /api/auth/login:
+    post:
+      summary: Đăng nhập user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: user@example.com
+              password: password123
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              example:
+                success: true
+                message: Đăng nhập thành công
+                data:
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDdmMWY3N2JjZjg2Y2Q3OTk0MzkwMTEiLCJpYXQiOjE3MTAwMDAwMDAsImV4cCI6MTcxMDYwNDgwMH0.example"
+                  user:
+                    _id: "507f1f77bcf86cd799439011"
+                    email: user@example.com
+                    username: john_doe
+                    createdAt: "2024-01-01T00:00:00.000Z"
+                    updatedAt: "2024-01-01T00:00:00.000Z"
+        '400':
+          description: Lỗi validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              example:
+                success: false
+                message: "email: Email không hợp lệ, password: Trường này là bắt buộc"
+        '401':
+          description: Email hoặc mật khẩu không đúng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Email hoặc mật khẩu không đúng
+        '500':
+          description: Lỗi server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Đã xảy ra lỗi. Vui lòng thử lại sau.
+
+  /api/auth/logout:
+    post:
+      summary: Đăng xuất user
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Đăng xuất thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Đăng xuất thành công
+              example:
+                success: true
+                message: Đăng xuất thành công
+        '401':
+          description: Không có quyền truy cập hoặc token không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Không tìm thấy token. Vui lòng đăng nhập.
+        '404':
+          description: User không tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Người dùng không tồn tại
+        '500':
+          description: Lỗi server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Đã xảy ra lỗi. Vui lòng thử lại sau.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Nhập JWT token. Format: Bearer <token>"
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: User ID
+          example: "507f1f77bcf86cd799439011"
+        email:
+          type: string
+          format: email
+          description: Email của user
+          example: user@example.com
+        username:
+          type: string
+          description: Tên người dùng
+          example: john_doe
+        createdAt:
+          type: string
+          format: date-time
+          description: Thời gian tạo
+        updatedAt:
+          type: string
+          format: date-time
+          description: Thời gian cập nhật
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - username
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email của user
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+          description: Mật khẩu (tối thiểu 6 ký tự)
+          example: password123
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          description: Tên người dùng (3-50 ký tự)
+          example: john_doe
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email của user
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          description: Mật khẩu
+          example: password123
+
+    RegisterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Đăng ký thành công
+        data:
+          $ref: '#/components/schemas/User'
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Đăng nhập thành công
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              description: JWT token để xác thực các request sau
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            user:
+              $ref: '#/components/schemas/User'
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Error message
+        error:
+          type: string
+          description: Chi tiết lỗi (chỉ trong development)
+
+    ValidationError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "email: Email không hợp lệ, password: Mật khẩu phải có ít nhất 6 ký tự"
+
