@@ -15,15 +15,12 @@ import {
 } from './utils';
 import { ERROR_MESSAGES, HTTP_STATUS } from './constants';
 
-// Khởi tạo Express app
 const app: Application = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Swagger Documentation
 app.use(
   '/api-docs',
   swaggerUi.serve,
@@ -33,7 +30,6 @@ app.use(
   })
 );
 
-// Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
   const db = getDb();
   res.status(200).json({
@@ -44,10 +40,8 @@ app.get('/health', (req: Request, res: Response) => {
   });
 });
 
-// API Routes
 app.use('/api/auth', authRoutes);
 
-// 404 handler
 app.use((req: Request, res: Response) => {
   return errorResponse(
     res,
@@ -56,7 +50,6 @@ app.use((req: Request, res: Response) => {
   );
 });
 
-// Error handler middleware
 app.use(
   (
     err: Error | ZodError | AppError,
@@ -66,18 +59,15 @@ app.use(
   ) => {
     console.error('Error:', err);
 
-    // Xử lý lỗi từ Zod validation
     if (err instanceof ZodError) {
       const message = handleZodError(err);
       return errorResponse(res, message, HTTP_STATUS.BAD_REQUEST);
     }
 
-    // Xử lý lỗi từ AppError
     if (err instanceof AppError) {
       return errorResponse(res, err.message, err.statusCode);
     }
 
-    // Xử lý lỗi thông thường
     const statusCode = getStatusCodeFromError(err);
     const message =
       formatErrorMessage(err, envConfig.NODE_ENV === 'development') ||
@@ -87,13 +77,10 @@ app.use(
   }
 );
 
-// Khởi động server
 const startServer = async () => {
   try {
-    // Kết nối database
     await connectDB();
 
-    // Start server
     const PORT = envConfig.PORT;
     app.listen(PORT, () => {
       console.log(`\n🚀 Server is running on port ${PORT}`);

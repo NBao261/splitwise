@@ -1,9 +1,9 @@
-const js = require('@eslint/js');
-const tseslint = require('typescript-eslint');
-const prettier = require('eslint-plugin-prettier');
-const prettierConfig = require('eslint-config-prettier');
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import prettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
 
-module.exports = tseslint.config(
+export default tseslint.config(
   {
     ignores: ['dist', 'node_modules', '*.js'],
   },
@@ -36,3 +36,4 @@ module.exports = tseslint.config(
   },
   prettierConfig
 );
+

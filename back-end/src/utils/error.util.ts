@@ -41,7 +41,6 @@ export const getStatusCodeFromError = (error: Error | AppError): number => {
 
   const message = error.message.toLowerCase();
 
-  // Validation errors
   if (
     message.includes('không hợp lệ') ||
     message.includes('phải có') ||
@@ -51,7 +50,6 @@ export const getStatusCodeFromError = (error: Error | AppError): number => {
     return HTTP_STATUS.BAD_REQUEST;
   }
 
-  // Authentication errors
   if (
     message.includes('email hoặc mật khẩu') ||
     message.includes('token') ||
@@ -61,17 +59,14 @@ export const getStatusCodeFromError = (error: Error | AppError): number => {
     return HTTP_STATUS.UNAUTHORIZED;
   }
 
-  // Forbidden errors
   if (message.includes('forbidden') || message.includes('không có quyền')) {
     return HTTP_STATUS.FORBIDDEN;
   }
 
-  // Not found errors
   if (message.includes('không tìm thấy') || message.includes('not found')) {
     return HTTP_STATUS.NOT_FOUND;
   }
 
-  // Conflict errors
   if (
     message.includes('đã được sử dụng') ||
     message.includes('đã tồn tại') ||
@@ -80,7 +75,6 @@ export const getStatusCodeFromError = (error: Error | AppError): number => {
     return HTTP_STATUS.CONFLICT;
   }
 
-  // Default to 500
   return HTTP_STATUS.INTERNAL_SERVER_ERROR;
 };
 
@@ -95,7 +89,6 @@ export const formatErrorMessage = (
     return error.message;
   }
 
-  // Trong production, không trả về chi tiết lỗi
   if (!isDevelopment) {
     return ERROR_MESSAGES.SERVER.INTERNAL_ERROR;
   }

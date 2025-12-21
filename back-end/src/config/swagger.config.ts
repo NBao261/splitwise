@@ -3,16 +3,12 @@ import path from 'path';
 import yaml from 'js-yaml';
 import { envConfig } from './env.config';
 
-/**
- * Đọc và parse file swagger.yaml
- */
 const loadSwaggerSpec = () => {
   try {
     const swaggerPath = path.join(__dirname, '../docs/swagger.yaml');
     const fileContents = fs.readFileSync(swaggerPath, 'utf8');
     const swaggerSpec = yaml.load(fileContents) as any;
 
-    // Cập nhật server URL với port từ env
     if (swaggerSpec.servers && swaggerSpec.servers.length > 0) {
       swaggerSpec.servers[0].url = `http://localhost:${envConfig.PORT}`;
     }

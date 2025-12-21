@@ -4,17 +4,12 @@ import { envConfig } from '../config/env.config';
 import { ERROR_MESSAGES, HTTP_STATUS } from '../constants';
 import { errorResponse } from '../utils';
 
-/**
- * Middleware xác thực JWT token
- * Lấy token từ Header Authorization -> Verify -> Gán userId vào req.user
- */
 export const authMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    // Lấy token từ Header Authorization
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -25,7 +20,6 @@ export const authMiddleware = (
       );
     }
 
-    // Format: "Bearer <token>"
     const token = authHeader.startsWith('Bearer ')
       ? authHeader.slice(7)
       : authHeader;
@@ -38,12 +32,10 @@ export const authMiddleware = (
       );
     }
 
-    // Verify token
     const decoded = jwt.verify(token, envConfig.JWT_SECRET) as {
       userId: string;
     };
 
-    // Gán userId vào req.user
     req.user = {
       userId: decoded.userId,
     };

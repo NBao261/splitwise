@@ -4,14 +4,9 @@ import { errorResponse } from '../utils';
 import { ERROR_MESSAGES, HTTP_STATUS } from '../constants';
 import { handleZodError } from '../utils/error.util';
 
-/**
- * Middleware để validate request body với Zod schema
- * @param schema - Zod schema để validate
- */
 export const validate = (schema: ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Validate và parse request body
       req.body = schema.parse(req.body);
       next();
     } catch (error) {

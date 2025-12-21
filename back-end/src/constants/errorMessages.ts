@@ -1,10 +1,4 @@
-/**
- * Tất cả error messages trong hệ thống
- * Giúp quản lý tập trung và dễ dàng thay đổi/thêm ngôn ngữ sau này
- */
-
 export const ERROR_MESSAGES = {
-  // Authentication errors
   AUTH: {
     EMAIL_ALREADY_EXISTS: 'Email đã được sử dụng',
     INVALID_CREDENTIALS: 'Email hoặc mật khẩu không đúng',
@@ -16,7 +10,6 @@ export const ERROR_MESSAGES = {
     USER_ID_NOT_FOUND: 'Lỗi: User ID không tồn tại',
   },
 
-  // User errors
   USER: {
     CREATE_FAILED: 'Lỗi khi tạo user',
     NOT_FOUND: 'Người dùng không tồn tại',
@@ -24,7 +17,6 @@ export const ERROR_MESSAGES = {
     DELETE_FAILED: 'Lỗi khi xóa người dùng',
   },
 
-  // Validation errors
   VALIDATION: {
     INVALID_EMAIL: 'Email không hợp lệ',
     INVALID_PASSWORD: 'Mật khẩu không hợp lệ',
@@ -35,7 +27,6 @@ export const ERROR_MESSAGES = {
     INVALID_INPUT: 'Dữ liệu đầu vào không hợp lệ',
   },
 
-  // Server errors
   SERVER: {
     INTERNAL_ERROR: 'Đã xảy ra lỗi. Vui lòng thử lại sau.',
     ROUTE_NOT_FOUND: 'Route not found',
