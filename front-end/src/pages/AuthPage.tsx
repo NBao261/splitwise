@@ -19,11 +19,14 @@ export function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <div className="relative flex h-screen w-screen overflow-hidden">
-      {/* Animated Background Gradient */}
+    <div className="relative flex h-screen w-screen overflow-hidden bg-black">
+      {/* 3D Scene Background */}
       <div className="absolute inset-0">
+        <ThreeScene />
+
+        {/* Animated Gradient Overlays */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-amber-900"
+          className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-purple-900/70 to-amber-900/60 mix-blend-soft-light"
           animate={{
             background: [
               'linear-gradient(to bottom right, #0f172a, #581c87, #064e3b, #78350f)',
@@ -40,7 +43,7 @@ export function AuthPage() {
 
         {/* Animated Mesh Gradient Overlay */}
         <motion.div
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-40 mix-blend-screen"
           animate={{
             background: [
               'radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.3) 0%, transparent 50%)',
@@ -56,7 +59,7 @@ export function AuthPage() {
           }}
         />
 
-        {/* Floating Particles Background */}
+        {/* Floating Particles Overlay */}
         <div className="absolute inset-0 overflow-hidden">
           {FLOATING_PARTICLES.map(particle => (
             <motion.div
@@ -82,16 +85,9 @@ export function AuthPage() {
         </div>
       </div>
 
-      {/* 3D Scene - Left Side (Desktop) */}
-      <div className="hidden lg:block lg:w-[60%] relative">
-        <div className="absolute inset-0">
-          <ThreeScene />
-        </div>
-      </div>
-
-      {/* Auth Form - Right Side (Desktop) / Full Screen (Mobile) */}
-      <div className="flex w-full lg:w-[40%] items-center justify-center p-4 lg:p-8 relative z-10">
-        <div className="w-full max-w-md">
+      {/* Centered Auth Form (shifted on desktop to reveal logo) */}
+      <div className="relative z-10 flex w-full h-full items-center justify-center lg:justify-end p-4 lg:p-8">
+        <div className="w-full max-w-md lg:mr-24 xl:mr-32">
           <AnimatePresence mode="wait">
             {isLogin ? (
               <motion.div

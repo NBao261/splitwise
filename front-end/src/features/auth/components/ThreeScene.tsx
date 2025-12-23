@@ -22,6 +22,7 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
   // Tạo texture một lần duy nhất
   const coinTexture = useMemo(() => createCoinTexture(), []);
   const smokeTexture = useMemo(() => createSmokeTexture(), []);
+  const snowflakeTexture = useMemo(() => createSnowflakeTexture(), []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -45,22 +46,22 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    // Lighting - Christmas mood
+    scene.add(new THREE.AmbientLight(0xf5f5ff, 0.7));
 
-    const pointLight = new THREE.PointLight(0xffd700, 2, 100);
+    const pointLight = new THREE.PointLight(0xfff3b0, 2, 100);
     pointLight.position.set(5, 5, 5);
     scene.add(pointLight);
 
-    const pointLight2 = new THREE.PointLight(0xffa500, 1.8, 100);
+    const pointLight2 = new THREE.PointLight(0x8fd3ff, 1.6, 100);
     pointLight2.position.set(-5, -5, 5);
     scene.add(pointLight2);
 
-    const directionalLight = new THREE.DirectionalLight(0xffc125, 1.2);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
     directionalLight.position.set(0, 5, 5);
     scene.add(directionalLight);
 
-    const spotLight = new THREE.SpotLight(0xffd700, 2, 20, Math.PI / 6, 0.5);
+    const spotLight = new THREE.SpotLight(0xfff5d0, 2.2, 20, Math.PI / 6, 0.5);
     spotLight.position.set(0, 0, 10);
     spotLight.target.position.set(0, 0, 0);
     scene.add(spotLight);
@@ -70,14 +71,14 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
     const coinGroup = coinGroupRef.current;
     scene.add(coinGroup);
 
-    // Coin front
+    // Coin front (Christmas ornament coin)
     const coinGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.2, 64);
     const coinMaterial = new THREE.MeshStandardMaterial({
       map: coinTexture,
-      metalness: 0.95,
-      roughness: 0.05,
-      emissive: 0xffd700,
-      emissiveIntensity: 0.6,
+      metalness: 0.9,
+      roughness: 0.2,
+      emissive: 0xd32f2f,
+      emissiveIntensity: 0.5,
       emissiveMap: coinTexture,
     });
 
@@ -87,11 +88,11 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
 
     // Coin back
     const coinBackMaterial = new THREE.MeshStandardMaterial({
-      color: 0xffd700,
-      metalness: 0.95,
-      roughness: 0.05,
-      emissive: 0xdaa520,
-      emissiveIntensity: 0.3,
+      color: 0xd32f2f,
+      metalness: 0.9,
+      roughness: 0.25,
+      emissive: 0x7f0000,
+      emissiveIntensity: 0.4,
     });
 
     const coinBack = new THREE.Mesh(coinGeometry, coinBackMaterial);
@@ -102,11 +103,11 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
     // Coin edges
     const edgeGeometry = new THREE.TorusGeometry(1.5, 0.2, 16, 64);
     const edgeMaterial = new THREE.MeshStandardMaterial({
-      color: 0xffa500,
-      metalness: 0.98,
-      roughness: 0.02,
-      emissive: 0xb8860b,
-      emissiveIntensity: 0.25,
+      color: 0xffffff,
+      metalness: 0.95,
+      roughness: 0.15,
+      emissive: 0xb71c1c,
+      emissiveIntensity: 0.3,
     });
 
     const edge1 = new THREE.Mesh(edgeGeometry, edgeMaterial);
@@ -123,18 +124,22 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
     const effectsGroup = effectsGroupRef.current;
     scene.add(effectsGroup);
 
-    // Smoke particles
+    // Smoke particles (soft, subtle)
     const smokeParticles = createSmokeParticles(smokeTexture);
     effectsGroup.add(smokeParticles);
 
-    // Glow rings
+    // Snow particles (gentle snowfall)
+    const snowParticles = createSnowParticles(snowflakeTexture);
+    effectsGroup.add(snowParticles);
+
+    // Glow rings (minimal halos)
     const glowRings: THREE.Mesh[] = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
       const ringGeo = new THREE.TorusGeometry(1.8 + i * 0.4, 0.08, 16, 64);
       const ringMat = new THREE.MeshBasicMaterial({
-        color: 0xffd700,
+        color: i === 0 ? 0xff8a80 : i === 1 ? 0xa5d6a7 : 0x90caf9,
         transparent: true,
-        opacity: 0.4 - i * 0.08,
+        opacity: 0.3 - i * 0.06,
         side: THREE.DoubleSide,
       });
       const ring = new THREE.Mesh(ringGeo, ringMat);
@@ -143,25 +148,22 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
       effectsGroup.add(ring);
     }
 
-    // Sparkles
+    // Sparkles (reduced, snow-like)
     const sparkles = createSparkles();
     effectsGroup.add(sparkles);
 
-    // Glow sphere
+    // Glow sphere (soft snowy glow)
     const glowSphereGeo = new THREE.SphereGeometry(2, 32, 32);
     const glowSphereMat = new THREE.MeshBasicMaterial({
-      color: 0xffd700,
+      color: 0xe3f2fd,
       transparent: true,
-      opacity: 0.2,
+      opacity: 0.22,
       side: THREE.BackSide,
     });
     const glowSphere = new THREE.Mesh(glowSphereGeo, glowSphereMat);
     effectsGroup.add(glowSphere);
 
-    // Solar system
-    const { planets, orbits } = createSolarSystem();
-    planets.forEach(p => effectsGroup.add(p));
-    orbits.forEach(o => effectsGroup.add(o));
+    // (Removed solar system for a calmer scene)
 
     // Resize handler
     const handleResize = () => {
@@ -182,16 +184,16 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
       const time = clock.getElapsedTime();
       const { x: mx, y: my } = mousePositionRef.current;
 
-      // Coin movement & tilt
-      const targetX = mx * 2.5 + Math.sin(time * 0.5) * 0.5;
-      const targetY = -my * 2.5 + Math.cos(time * 0.5) * 0.5;
+      // Coin movement & tilt (slower, calmer)
+      const targetX = mx * 1.8 + Math.sin(time * 0.3) * 0.25;
+      const targetY = -my * 1.8 + Math.cos(time * 0.3) * 0.25;
 
-      coinGroup.position.x += (targetX - coinGroup.position.x) * 0.15;
-      coinGroup.position.y += (targetY - coinGroup.position.y) * 0.15;
+      coinGroup.position.x += (targetX - coinGroup.position.x) * 0.1;
+      coinGroup.position.y += (targetY - coinGroup.position.y) * 0.1;
 
-      coinGroup.rotation.z += 0.001;
-      coinGroup.rotation.y += 0.0005;
-      coinGroup.rotation.x = Math.PI / 2 + my * 0.4;
+      coinGroup.rotation.z += 0.0006;
+      coinGroup.rotation.y += 0.0003;
+      coinGroup.rotation.x = Math.PI / 2 + my * 0.3;
 
       // Lights movement
       pointLight.position.x = 5 + Math.sin(time) * 2;
@@ -205,12 +207,14 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
       effectsGroup.position.copy(coinGroup.position);
       effectsGroup.rotation.z = coinGroup.rotation.z;
 
-      // Animate glow rings
+      // Animate glow rings (slow & gentle)
       glowRings.forEach((ring, i) => {
-        ring.rotation.z = time * (0.05 + i * 0.02);
-        const opacity = 0.4 - i * 0.08 + Math.sin(time * 0.5 + i) * 0.15;
+        ring.rotation.z = time * (0.02 + i * 0.01);
+        const baseOpacity = 0.25 - i * 0.05;
+        const opacity = baseOpacity + Math.sin(time * 0.3 + i) * 0.05;
         (ring.material as THREE.MeshBasicMaterial).opacity = opacity;
-        ring.scale.setScalar(1 + Math.sin(time * 0.3 + i * 0.5) * 0.1);
+        const scale = 1 + Math.sin(time * 0.2 + i * 0.5) * 0.05;
+        ring.scale.setScalar(scale);
       });
 
       // Glow sphere pulse
@@ -222,11 +226,11 @@ export function ThreeScene({ onLoad }: ThreeSceneProps) {
       // Animate smoke
       animateSmoke(smokeParticles);
 
+      // Animate snow
+      animateSnow(snowParticles, time);
+
       // Animate sparkles
       animateSparkles(sparkles, time);
-
-      // Animate planets
-      animatePlanets(planets, coinGroup.position, time);
 
       camera.lookAt(coinGroup.position);
       renderer.render(scene, camera);
@@ -280,25 +284,29 @@ function createCoinTexture(): THREE.CanvasTexture {
   canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
 
-  const cX = 256,
-    cY = 256,
-    radius = 200;
+  const cX = 256;
+  const cY = 256;
+  const radius = 200;
 
+  // Christmas ornament gradient
   const grad = ctx.createRadialGradient(cX, cY, 0, cX, cY, radius);
-  grad.addColorStop(0, '#FFD700');
-  grad.addColorStop(0.3, '#FFE55C');
-  grad.addColorStop(0.7, '#FFA500');
-  grad.addColorStop(1, '#DAA520');
+  grad.addColorStop(0, '#ffebee');
+  grad.addColorStop(0.35, '#ef9a9a');
+  grad.addColorStop(0.7, '#c62828');
+  grad.addColorStop(1, '#8b0000');
 
   ctx.fillStyle = grad;
+  ctx.beginPath();
   ctx.arc(cX, cY, radius, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = '#B8860B';
-  ctx.lineWidth = 6;
+  // Outer ring
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 8;
   ctx.stroke();
 
-  ctx.strokeStyle = '#FFD700';
+  // Inner glowing ring
+  ctx.strokeStyle = '#c8e6c9';
   ctx.lineWidth = 2;
   ctx.globalAlpha = 0.6;
   ctx.beginPath();
@@ -306,36 +314,183 @@ function createCoinTexture(): THREE.CanvasTexture {
   ctx.stroke();
   ctx.globalAlpha = 1;
 
-  // Split symbol
-  const iconR = 50,
-    offset = 20;
-  ctx.fillStyle = ctx.strokeStyle = '#FFFFFF';
-  ctx.lineWidth = 12;
-
+  // Christmas tree silhouette in center
+  ctx.save();
+  ctx.translate(cX, cY - 20);
+  ctx.fillStyle = '#1b5e20';
+  ctx.strokeStyle = '#a5d6a7';
+  ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.arc(cX - offset, cY - 10, iconR, 0, Math.PI * 2);
-  ctx.stroke();
+  ctx.moveTo(0, -70);
+  ctx.lineTo(-45, -20);
+  ctx.lineTo(-20, -20);
+  ctx.lineTo(-60, 20);
+  ctx.lineTo(-25, 20);
+  ctx.lineTo(-70, 60);
+  ctx.lineTo(70, 60);
+  ctx.lineTo(25, 20);
+  ctx.lineTo(60, 20);
+  ctx.lineTo(20, -20);
+  ctx.lineTo(45, -20);
+  ctx.closePath();
   ctx.fill();
+  ctx.stroke();
 
+  // Tree trunk
+  ctx.fillStyle = '#4e342e';
+  ctx.fillRect(-15, 60, 30, 28);
+
+  // Ornaments
+  const ornamentColors = ['#ffeb3b', '#ff5722', '#81d4fa', '#ff80ab'];
+  for (let i = 0; i < 18; i++) {
+    const angle = (i / 18) * Math.PI * 2;
+    const r = 55 + Math.sin(i * 0.7) * 15;
+    const ox = Math.cos(angle) * (r * 0.35);
+    const oy = Math.sin(angle) * (r * 0.4);
+    ctx.beginPath();
+    ctx.fillStyle = ornamentColors[i % ornamentColors.length];
+    ctx.arc(ox, oy, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Star on top
+  ctx.fillStyle = '#ffeb3b';
   ctx.beginPath();
-  ctx.arc(cX + offset, cY - 10, iconR, 0, Math.PI * 2);
-  ctx.stroke();
+  for (let i = 0; i < 5; i++) {
+    const outerAngle = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+    const innerAngle = outerAngle + Math.PI / 5;
+    const rOuter = 14;
+    const rInner = 6;
+    const xOuter = Math.cos(outerAngle) * rOuter;
+    const yOuter = Math.sin(outerAngle) * rOuter - 75;
+    const xInner = Math.cos(innerAngle) * rInner;
+    const yInner = Math.sin(innerAngle) * rInner - 75;
+    if (i === 0) {
+      ctx.moveTo(xOuter, yOuter);
+    } else {
+      ctx.lineTo(xOuter, yOuter);
+    }
+    ctx.lineTo(xInner, yInner);
+  }
+  ctx.closePath();
   ctx.fill();
+  ctx.restore();
 
   // Text
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 42px "Segoe UI", Arial, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 40px "Segoe UI", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('SPLITWISE', cX, cY + 85);
+  ctx.fillText('MERRY SPLITMAS', cX, cY + 85);
 
-  ctx.fillStyle = '#B8860B';
+  ctx.fillStyle = '#c8e6c9';
   ctx.font = '300 18px "Segoe UI", Arial, sans-serif';
-  ctx.fillText('SHARE EXPENSES', cX, cY + 115);
+  ctx.fillText('SHARE JOY · SHARE EXPENSES', cX, cY + 115);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.needsUpdate = true;
   return tex;
+}
+
+function createSnowflakeTexture(): THREE.CanvasTexture {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+
+  const c = size / 2;
+  ctx.translate(c, c);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.0)';
+  ctx.fillRect(-c, -c, size, size);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.strokeStyle = 'rgba(227,242,253,0.9)';
+  ctx.lineWidth = 1.2;
+
+  const petalLength = 22;
+  const petalWidth = 6;
+
+  for (let i = 0; i < 6; i++) {
+    const angle = (i * Math.PI) / 3;
+    ctx.save();
+    ctx.rotate(angle);
+
+    // Petal shape
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(petalWidth, -petalLength * 0.3, 0, -petalLength);
+    ctx.quadraticCurveTo(-petalWidth, -petalLength * 0.3, 0, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Small side petals
+    ctx.beginPath();
+    ctx.moveTo(0, -petalLength * 0.5);
+    ctx.quadraticCurveTo(
+      petalWidth * 1.2,
+      -petalLength * 0.6,
+      petalWidth * 0.9,
+      -petalLength * 0.9
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0, -petalLength * 0.5);
+    ctx.quadraticCurveTo(
+      -petalWidth * 1.2,
+      -petalLength * 0.6,
+      -petalWidth * 0.9,
+      -petalLength * 0.9
+    );
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // Soft glow in center
+  const radial = ctx.createRadialGradient(0, 0, 0, 0, 0, petalLength);
+  radial.addColorStop(0, 'rgba(255,255,255,0.9)');
+  radial.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = radial;
+  ctx.beginPath();
+  ctx.arc(0, 0, petalLength, 0, Math.PI * 2);
+  ctx.fill();
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function createSnowParticles(texture: THREE.Texture): THREE.Points {
+  const count = 120;
+  const positions = new Float32Array(count * 3);
+  const speeds = new Float32Array(count);
+
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    positions[i3] = (Math.random() - 0.5) * 10; // spread horizontally
+    positions[i3 + 1] = Math.random() * 8; // height
+    positions[i3 + 2] = (Math.random() - 0.5) * 6;
+    speeds[i] = 0.1 + Math.random() * 0.15;
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('speed', new THREE.BufferAttribute(speeds, 1));
+
+  const material = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 0.16,
+    map: texture,
+    transparent: true,
+    opacity: 0.95,
+    alphaTest: 0.1,
+    depthWrite: false,
+  });
+
+  return new THREE.Points(geometry, material);
 }
 
 function createSmokeTexture(): THREE.CanvasTexture {
@@ -344,12 +499,12 @@ function createSmokeTexture(): THREE.CanvasTexture {
   const ctx = canvas.getContext('2d')!;
 
   const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
-  grad.addColorStop(0, 'rgba(255,215,0,1)');
-  grad.addColorStop(0.2, 'rgba(255,165,0,0.8)');
-  grad.addColorStop(0.4, 'rgba(255,140,0,0.6)');
-  grad.addColorStop(0.6, 'rgba(255,69,0,0.4)');
-  grad.addColorStop(0.8, 'rgba(139,69,19,0.2)');
-  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  // Soft snowy glow
+  grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+  grad.addColorStop(0.3, 'rgba(227, 242, 253, 0.8)');
+  grad.addColorStop(0.6, 'rgba(187, 222, 251, 0.4)');
+  grad.addColorStop(0.85, 'rgba(144, 202, 249, 0.15)');
+  grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 256, 256);
@@ -364,7 +519,7 @@ interface SmokeGeometry extends THREE.BufferGeometry {
 }
 
 function createSmokeParticles(texture: THREE.Texture): THREE.Points {
-  const count = 200;
+  const count = 80;
   const positions = new Float32Array(count * 3);
   const velocities = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
@@ -373,18 +528,18 @@ function createSmokeParticles(texture: THREE.Texture): THREE.Points {
   for (let i = 0; i < count; i++) {
     const i3 = i * 3;
     const angle = Math.random() * Math.PI * 2;
-    const radius = Math.random() * 0.5;
+    const radius = Math.random() * 0.6;
 
     positions[i3] = Math.cos(angle) * radius;
-    positions[i3 + 1] = Math.random() * 0.3 - 0.5;
+    positions[i3 + 1] = Math.random() * 0.3 - 0.6;
     positions[i3 + 2] = Math.sin(angle) * radius;
 
-    velocities[i3] = (Math.random() - 0.5) * 0.02;
-    velocities[i3 + 1] = Math.random() * 0.03 + 0.02;
-    velocities[i3 + 2] = (Math.random() - 0.5) * 0.02;
+    velocities[i3] = (Math.random() - 0.5) * 0.01;
+    velocities[i3 + 1] = Math.random() * 0.02 + 0.01;
+    velocities[i3 + 2] = (Math.random() - 0.5) * 0.01;
 
-    sizes[i] = Math.random() * 0.5 + 0.3;
-    opacities[i] = Math.random() * 0.5 + 0.5;
+    sizes[i] = Math.random() * 0.35 + 0.2;
+    opacities[i] = Math.random() * 0.4 + 0.4;
   }
 
   const geometry = new THREE.BufferGeometry() as SmokeGeometry;
@@ -411,7 +566,8 @@ function createSmokeParticles(texture: THREE.Texture): THREE.Points {
       varying float vOpacity;
       void main() {
         vec4 tex = texture2D(smokeTexture, gl_PointCoord);
-        gl_FragColor = vec4(1.0, 0.65, 0.0, tex.a * vOpacity);
+        // bluish-white snow mist
+        gl_FragColor = vec4(0.9, 0.96, 1.0, tex.a * vOpacity);
       }
     `,
     transparent: true,
@@ -423,7 +579,7 @@ function createSmokeParticles(texture: THREE.Texture): THREE.Points {
 }
 
 function createSparkles(): THREE.Points {
-  const count = 200;
+  const count = 80;
   const positions = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
   const opacities = new Float32Array(count);
@@ -431,14 +587,14 @@ function createSparkles(): THREE.Points {
   for (let i = 0; i < count; i++) {
     const i3 = i * 3;
     const angle = Math.random() * Math.PI * 2;
-    const radius = 2.5 + Math.random() * 2.5;
+    const radius = 2.5 + Math.random() * 2;
 
     positions[i3] = Math.cos(angle) * radius;
     positions[i3 + 1] = (Math.random() - 0.5) * 3;
     positions[i3 + 2] = Math.sin(angle) * radius;
 
-    sizes[i] = Math.random() * 0.15 + 0.08;
-    opacities[i] = Math.random() * 0.9 + 0.1;
+    sizes[i] = Math.random() * 0.14 + 0.08;
+    opacities[i] = Math.random() * 0.6 + 0.25;
   }
 
   const geometry = new THREE.BufferGeometry();
@@ -463,9 +619,10 @@ function createSparkles(): THREE.Points {
     fragmentShader: /* glsl */ `
       varying float vOpacity;
       void main() {
+        // soft snowflake-like falloff
         float d = distance(gl_PointCoord, vec2(0.5));
-        float a = 1.0 - smoothstep(0.0, 0.5, d);
-        vec3 c = mix(vec3(1.0, 0.84, 0.0), vec3(1.0, 1.0, 1.0), d * 2.0);
+        float a = 1.0 - smoothstep(0.0, 0.55, d);
+        vec3 c = mix(vec3(0.9, 0.96, 1.0), vec3(1.0, 1.0, 1.0), d * 1.5);
         gl_FragColor = vec4(c, a * vOpacity);
       }
     `,
@@ -475,70 +632,6 @@ function createSparkles(): THREE.Points {
   });
 
   return new THREE.Points(geometry, material);
-}
-
-function createSolarSystem() {
-  const planets: THREE.Mesh[] = [];
-  const orbits: THREE.Mesh[] = [];
-
-  const configs: Array<[number, number, number, number]> = [
-    [2.5, 0.15, 0x8b7355, 1.2],
-    [3.2, 0.18, 0xffc649, 1.0],
-    [4.0, 0.2, 0x6b93d6, 0.8],
-    [5.2, 0.16, 0xc1440e, 0.6],
-    [7.0, 0.35, 0xd8ca9d, 0.4],
-    [8.5, 0.3, 0xfad5a5, 0.3],
-    [10.0, 0.25, 0x4fd0e7, 0.2],
-    [11.5, 0.24, 0x4b70dd, 0.15],
-  ];
-
-  configs.forEach(([radius, size, color, speed], i) => {
-    // Orbit
-    const orbitGeo = new THREE.RingGeometry(radius - 0.02, radius + 0.02, 64);
-    const orbitMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.1,
-      side: THREE.DoubleSide,
-    });
-    const orbit = new THREE.Mesh(orbitGeo, orbitMat);
-    orbit.rotation.x = Math.PI / 2;
-    orbits.push(orbit);
-
-    // Planet
-    const geo = new THREE.SphereGeometry(size, 16, 16);
-    const mat = new THREE.MeshStandardMaterial({
-      color,
-      emissive: color,
-      emissiveIntensity: 0.3,
-      metalness: 0.3,
-      roughness: 0.7,
-    });
-    const planet = new THREE.Mesh(geo, mat);
-    planet.position.x = radius;
-    planet.userData = {
-      orbitRadius: radius,
-      speed,
-      angle: Math.random() * Math.PI * 2,
-    };
-    planets.push(planet);
-
-    if (i === 5) {
-      // Saturn rings
-      const ringGeo = new THREE.RingGeometry(size * 1.5, size * 2.2, 32);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: 0xfad5a5,
-        transparent: true,
-        opacity: 0.6,
-        side: THREE.DoubleSide,
-      });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
-      ring.rotation.x = Math.PI / 2;
-      planet.add(ring);
-    }
-  });
-
-  return { planets, orbits };
 }
 
 function animateSmoke(particles: THREE.Points) {
@@ -578,6 +671,33 @@ function animateSmoke(particles: THREE.Points) {
   particles.geometry.attributes.opacity.needsUpdate = true;
 }
 
+function animateSnow(particles: THREE.Points, time: number) {
+  const pos = particles.geometry.attributes.position.array as Float32Array;
+  const speedAttr = particles.geometry.attributes
+    .speed as THREE.BufferAttribute;
+  const speeds = speedAttr.array as Float32Array;
+
+  for (let i = 0; i < pos.length / 3; i++) {
+    const i3 = i * 3;
+    const fallSpeed = speeds[i];
+
+    // fall down
+    pos[i3 + 1] -= fallSpeed * 0.02;
+    // gentle horizontal sway
+    pos[i3] += Math.sin(time * 0.2 + i * 0.5) * 0.002;
+    pos[i3 + 2] += Math.cos(time * 0.25 + i * 0.4) * 0.002;
+
+    // reset when below threshold
+    if (pos[i3 + 1] < -3) {
+      pos[i3] = (Math.random() - 0.5) * 10;
+      pos[i3 + 1] = 5 + Math.random() * 5;
+      pos[i3 + 2] = (Math.random() - 0.5) * 6;
+    }
+  }
+
+  particles.geometry.attributes.position.needsUpdate = true;
+}
+
 function animateSparkles(particles: THREE.Points, time: number) {
   const pos = particles.geometry.attributes.position.array as Float32Array;
   const opa = particles.geometry.attributes.opacity.array as Float32Array;
@@ -585,15 +705,15 @@ function animateSparkles(particles: THREE.Points, time: number) {
   for (let i = 0; i < pos.length / 3; i++) {
     const i3 = i * 3;
     const baseAngle = Math.atan2(pos[i3 + 2], pos[i3]);
-    const angle = baseAngle + time * (0.2 + (i % 3) * 0.05);
-    const baseR = 2.5 + (i % 5) * 0.5;
-    const r = baseR + Math.sin(time * 0.6 + i) * 0.8;
+    const angle = baseAngle + time * (0.08 + (i % 3) * 0.02);
+    const baseR = 2.5 + (i % 5) * 0.4;
+    const r = baseR + Math.sin(time * 0.3 + i) * 0.4;
 
     pos[i3] = Math.cos(angle) * r;
     pos[i3 + 2] = Math.sin(angle) * r;
-    pos[i3 + 1] = Math.sin(time * 1 + i * 0.5) * 2;
+    pos[i3 + 1] = Math.sin(time * 0.6 + i * 0.4) * 1.2;
 
-    opa[i] = Math.abs(Math.sin(time * 1 + i * 0.3)) * 0.9 + 0.1;
+    opa[i] = Math.abs(Math.sin(time * 0.6 + i * 0.25)) * 0.6 + 0.2;
   }
 
   particles.geometry.attributes.position.needsUpdate = true;
@@ -602,24 +722,6 @@ function animateSparkles(particles: THREE.Points, time: number) {
   if (particles.material instanceof THREE.ShaderMaterial) {
     particles.material.uniforms.time.value = time;
   }
-}
-
-function animatePlanets(
-  planets: THREE.Mesh[],
-  coinPos: THREE.Vector3,
-  time: number
-) {
-  planets.forEach(planet => {
-    const { orbitRadius, speed, angle } = planet.userData;
-    const newAngle = angle + time * speed * 0.01;
-    planet.userData.angle = newAngle;
-
-    planet.position.x = coinPos.x + Math.cos(newAngle) * orbitRadius;
-    planet.position.y = coinPos.y + Math.sin(newAngle) * 0.3 * orbitRadius;
-    planet.position.z = coinPos.z + Math.sin(newAngle) * orbitRadius;
-
-    planet.rotation.y += 0.0002;
-  });
 }
 
 function disposeRecursive(object: THREE.Object3D) {
