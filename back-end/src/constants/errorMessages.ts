@@ -17,6 +17,11 @@ export const ERROR_MESSAGES = {
     DELETE_FAILED: 'Lỗi khi xóa người dùng',
   },
 
+  GROUP: {
+    NOT_FOUND: 'Nhóm không tồn tại',
+    CREATE_FAILED: 'Lỗi khi tạo nhóm',
+  },
+
   VALIDATION: {
     INVALID_EMAIL: 'Email không hợp lệ',
     INVALID_PASSWORD: 'Mật khẩu không hợp lệ',

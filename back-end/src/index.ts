@@ -6,6 +6,7 @@ import { connectDB, getDb } from './lib/db';
 import { envConfig } from './config/env.config';
 import { swaggerSpec } from './config/swagger.config';
 import authRoutes from './routes/auth.routes';
+import groupRoutes from './routes/group.routes';
 import {
   errorResponse,
   getStatusCodeFromError,
@@ -41,6 +42,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/groups', groupRoutes);
 
 app.use((req: Request, res: Response) => {
   return errorResponse(
